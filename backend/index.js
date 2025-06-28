@@ -84,6 +84,7 @@ import examRoutes from './routes/examRoutes.js';
 import applicationRoutes from './routes/applicantsRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
+import moneyExachangeFeeRoutes from './routes/moneyExachangeFeeRoutes.js';
 
 dotenv.config();
 
@@ -158,6 +159,7 @@ app.use('/api', examRoutes);
 app.use('/api', applicationRoutes);
 app.use('/api', taskRoutes);
 app.use('/api', aiRoutes);
+app.use('/api', moneyExachangeFeeRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
