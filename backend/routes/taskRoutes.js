@@ -1,34 +1,36 @@
-// import express from 'express';
-// import { createTask, updateTask, getTasksForJob, getTasksForUser, saveTaskDocument, upload } from '../controllers/taskController.js';
-
-// const router = express.Router();
-
-// router.post('/task', createTask);
-// router.patch("/task/:taskId", updateTask)
-// router.get("/task/job/:jobId", getTasksForJob)
-// router.get("/task/user/:userId", getTasksForUser)
-// router.patch("/task/upload/:taskId",upload.array('files', 10), saveTaskDocument)
-
-
-// export default router;
-
-
-
 import express from 'express';
-import { createTask, updateTask, getTasksForJob, getTasksForUser, saveTaskDocument, upload } from '../controllers/taskController.js';
+import { 
+  createTask, 
+  updateTask, 
+  uploadInitialTaskFiles, 
+  getTasksForJob, 
+  getTasksForUser, 
+  saveTaskDocument,
+  uploadInitialFiles,
+  uploadSubmittedFiles,
+  getTaskFiles
+} from '../controllers/taskController.js';
 
 const router = express.Router();
+
+// Initial task files upload
+router.post(
+  '/tasks/initial/:jobId', 
+  uploadInitialFiles.array('files', 10), 
+  uploadInitialTaskFiles
+);
 
 // Task CRUD routes
 router.post('/task', createTask);
 router.patch("/task/:taskId", updateTask);
 router.get("/task/job/:jobId", getTasksForJob);
 router.get("/task/user/:userId", getTasksForUser);
+router.get("/task/files/:taskId", getTaskFiles);
 
-// File upload route with multer middleware
+// Completed task files submission
 router.patch(
   "/task/upload/:taskId", 
-  upload.array('files', 10), // Allow up to 10 files
+  uploadSubmittedFiles.array('files', 10),
   saveTaskDocument
 );
 

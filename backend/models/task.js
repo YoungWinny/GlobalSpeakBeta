@@ -1,3 +1,5 @@
+
+
 import mongoose from "mongoose";
 
 const TaskSchema = new mongoose.Schema({
@@ -8,31 +10,32 @@ const TaskSchema = new mongoose.Schema({
   },
   assignedTo: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', // References the Job Seeker who is assigned the task
-    required: true,
+    ref: 'User',
+    required: false
   },
   status: {
     type: String,
-    enum: ['in progress', 'completed'],
-    default: 'in progress',
+    enum: ['pending', 'assigned', 'in progress', 'completed', 'reviewed'],
+    default: 'pending'
   },
-  files: [
-    { 
-      type: String,
-    }
-  ],
+  initialFiles: [{  // Files uploaded by recruiter (task instructions)
+    type: String,
+  }],
+  submittedFiles: [{  // Files submitted by job seeker (completed work)
+    type: String,
+  }],
   payment: {
-    amount:{
-      type: String
-    },
-    message: {
-      type: String
-    }
+    amount: String,
+    message: String
   },
   rating: {
     type: Number, 
     min: 1,
     max: 5,
+  },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
   }
 }, {
   timestamps: true
