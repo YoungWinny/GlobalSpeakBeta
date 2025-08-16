@@ -1,0 +1,11 @@
+{"level":"error","message":"Evaluation failed: Cannot destructure property 'score' of '(intermediate value)' as it is undefined.","timestamp":"2025-08-06 02:01:24"}
+{"level":"error","message":"Evaluation failed: Cannot destructure property 'score' of '(intermediate value)' as it is undefined.","timestamp":"2025-08-06 02:01:29"}
+{"level":"error","message":"Evaluation failed: Evaluation failed: Unsupported pipeline: feature-extraction. Must be one of [text-classification,token-classification,question-answering,fill-mask,summarization,translation,text2text-generation,text-generation,zero-shot-classification,automatic-speech-recognition,image-to-text,image-classification,image-segmentation,zero-shot-image-classification,object-detection,embeddings]","timestamp":"2025-08-06 02:06:29"}
+{"level":"error","message":"Evaluation failed: Translation evaluation failed","timestamp":"2025-08-06 03:11:33"}
+{"level":"error","message":"Evaluation failed: Translation evaluation failed","timestamp":"2025-08-06 03:11:38"}
+{"level":"error","message":"Evaluation failed: Translation evaluation failed","timestamp":"2025-08-08 23:20:03"}
+{"level":"error","message":"Evaluation failed: Translation evaluation failed","timestamp":"2025-08-11 01:11:55"}
+{"level":"error","message":"Evaluation failed: Translation evaluation failed","timestamp":"2025-08-11 01:15:47"}
+{"level":"error","message":"Evaluation failed: Translation evaluation failed","timestamp":"2025-08-11 01:23:29"}
+{"level":"error","message":"Evaluation failed: Translation evaluation failed","timestamp":"2025-08-11 01:26:57"}
+{"level":"error","message":"Evaluation failed: Translation evaluation failed","timestamp":"2025-08-11 01:28:14"}

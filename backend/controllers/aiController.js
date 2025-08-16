@@ -1,91 +1,6 @@
 // import fs from 'fs';
 // import PDFParser from 'pdf2json';
 // import mammoth from 'mammoth';
-// import fetch from 'node-fetch';
-// import { FormData } from 'formdata-node';
-// import { fileURLToPath } from 'url';
-// import path from 'path';
-
-// const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-// const extractTextFromFile = async (filePath, mimetype) => {
-//   try {
-//     const fileBuffer = fs.readFileSync(filePath);
-
-//     if (mimetype === 'application/pdf') {
-//       return new Promise((resolve, reject) => {
-//         const pdfParser = new PDFParser();
-//         pdfParser.on("pdfParser_dataError", err => reject(err));
-//         pdfParser.on("pdfParser_dataReady", () => {
-//           resolve(pdfParser.getRawTextContent() || "");
-//         });
-//         pdfParser.parseBuffer(fileBuffer);
-//       });
-//     }
-
-//     if (mimetype.includes('wordprocessingml.document')) {
-//       const result = await mammoth.extractText({ buffer: fileBuffer });
-//       return result.value || "";
-//     }
-
-//     return fileBuffer.toString('utf-8');
-//   } catch (error) {
-//     throw new Error(`Text extraction failed: ${error.message}`);
-//   }
-// };
-
-// export const evaluateUploadedFile = async (req, res) => {
-//   if (!req.file || !req.body.sourceText) {
-//     return res.status(400).json({ error: "Missing file or source text" });
-//   }
-
-//   try {
-//     // 1. Extract text from uploaded file
-//     const submissionText = await extractTextFromFile(req.file.path, req.file.mimetype);
-    
-//     // 2. Prepare FormData for FastAPI
-//     const formData = new FormData();
-//     formData.append('source_text', req.body.sourceText);
-//     formData.append('translated_file', new Blob([submissionText]), req.file.originalname);
-
-//     // 3. Send to AI evaluator
-//     const response = await fetch('http://127.0.0.1:8001/evaluate', {
-//       method: 'POST',
-//       body: formData,
-//     });
-
-//     if (!response.ok) {
-//       const error = await response.text();
-//       throw new Error(error);
-//     }
-
-//     const result = await response.json();
-//     res.json(result);
-//   } catch (error) {
-//     console.error('Evaluation error:', error);
-//     res.status(500).json({ error: error.message });
-//   } finally {
-//     // Cleanup uploaded file
-//     try {
-//       if (req.file?.path) fs.unlinkSync(req.file.path);
-//     } catch (cleanupError) {
-//       console.warn('File cleanup failed:', cleanupError.message);
-//     }
-//   }
-// };
-
-
-
-
-
-
-
-
-
-
-// import fs from 'fs';
-// import PDFParser from 'pdf2json';
-// import mammoth from 'mammoth';
 // import FormData from 'form-data';
 // import fetch from 'node-fetch';
 // import path from 'path';
@@ -271,212 +186,72 @@
 
 
 
-import fs from 'fs';
-import PDFParser from 'pdf2json';
-import mammoth from 'mammoth';
-import FormData from 'form-data';
-import fetch from 'node-fetch';
-import path from 'path';
-import { fileURLToPath } from 'url';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// Configuration
-const EVALUATION_SERVICE_URL = 'http://127.0.0.1:8001/evaluate';
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-const ALLOWED_TYPES = [
-    'application/pdf',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'text/plain'
-];
-const REQUEST_TIMEOUT = 30000; // 30 seconds
 
-// Helper function for consistent error responses
-const createErrorResponse = (error, additionalInfo = {}) => {
-    const errorTypes = {
-        'PDF': {
-            message: "PDF Processing Error",
-            tips: ["Try converting to DOCX", "Check if text is selectable"],
-            status: 400
-        },
-        'encoding': {
-            message: "Encoding Issue", 
-            tips: ["Save as UTF-8 text", "Try DOCX format"],
-            status: 400
-        },
-        'request failed': {
-            message: "Evaluation Service Unavailable",
-            tips: ["Try again later", "Check service status"],
-            status: 503
-        },
-        'default': {
-            message: "Processing Error",
-            tips: [],
-            status: 500
-        }
-    };
 
-    const matchedError = Object.entries(errorTypes).find(([key]) => 
-        error.message.toLowerCase().includes(key.toLowerCase())
-    ) || ['default', errorTypes.default];
 
-    return {
-        ...additionalInfo,
-        success: false,
-        error: matchedError[1].message,
-        details: error.message,
-        troubleshooting: matchedError[1].tips,
-        statusCode: matchedError[1].status
-    };
-};
 
-// PDF Text Extraction
-const extractTextFromPDF = async (fileBuffer) => {
-    return new Promise((resolve, reject) => {
-        const pdfParser = new PDFParser(null, 1);
-        const timeout = setTimeout(() => {
-            pdfParser.destroy();
-            reject(new Error("PDF parsing timeout (15s exceeded)"));
-        }, 15000);
 
-        pdfParser.on("pdfParser_dataError", (err) => {
-            clearTimeout(timeout);
-            try {
-                const text = fileBuffer.toString('utf-8') || fileBuffer.toString('latin1');
-                if (text.trim().length > 0) return resolve(text);
-                throw new Error("Empty text extracted from PDF");
-            } catch (error) {
-                reject(new Error(`PDF parsing failed: ${err.message}`));
-            }
-        });
 
-        pdfParser.on("pdfParser_dataReady", () => {
-            clearTimeout(timeout);
-            try {
-                const text = pdfParser.getRawTextContent();
-                if (text && text.trim().length > 0) return resolve(text);
-                throw new Error("Empty PDF content");
-            } catch (error) {
-                reject(new Error("Failed to extract PDF text"));
-            }
-        });
 
-        try {
-            pdfParser.parseBuffer(fileBuffer);
-        } catch (parseError) {
-            clearTimeout(timeout);
-            reject(new Error(`PDF parse error: ${parseError.message}`));
-        }
-    });
-};
 
-// File Text Extraction
-const extractTextFromFile = async (filePath, mimetype) => {
-    try {
-        if (!fs.existsSync(filePath)) {
-            throw new Error(`File not found: ${filePath}`);
-        }
 
-        const fileBuffer = fs.readFileSync(filePath);
 
-        // Handle PDFs
-        if (mimetype === 'application/pdf') {
-            return await extractTextFromPDF(fileBuffer);
-        }
 
-        // Handle Word documents
-        if (mimetype.includes('wordprocessingml.document')) {
-            const { value } = await mammoth.extractText({ buffer: fileBuffer });
-            if (!value || value.trim().length === 0) {
-                throw new Error("DOCX appears to be empty");
-            }
-            return value;
-        }
 
-        // For text files - try multiple encodings
-        const encodings = ['utf-8', 'utf16le', 'latin1'];
-        let bestText = '';
-        
-        for (const encoding of encodings) {
-            try {
-                const text = fileBuffer.toString(encoding);
-                if (text.trim().length > bestText.trim().length) {
-                    bestText = text;
-                }
-            } catch (error) {
-                console.debug(`Encoding ${encoding} failed: ${error.message}`);
-            }
-        }
 
-        if (!bestText.trim()) {
-            throw new Error("Could not decode text content");
-        }
 
-        return bestText;
-    } catch (error) {
-        console.error("File processing error:", error);
-        throw new Error(`File processing failed: ${error.message}`);
-    }
-};
 
-// Main Evaluation Function
+
+
+
+import { evaluateTranslation, extractTextFromPDF, extractTextFromDOCX } from '../services/evaluator.js';
+import fs from 'fs/promises';
+
 export const evaluateUploadedFile = async (req, res) => {
-    try {
-        // Validate extracted text
-        const submissionText = await extractTextFromFile(req.file.path, req.file.mimetype);
-        
-        if (submissionText.trim().length < 10) {
-            throw new Error("Minimum 10 characters required");
-        }
+  const { sourceText } = req.body;
+  const file = req.file;
 
-        // Prepare evaluation request
-        const form = new FormData();
-        form.append('source_text', req.body.sourceText);
-        form.append('translated_file', fs.createReadStream(req.file.path), {
-            filename: req.file.originalname,
-            contentType: req.file.mimetype
-        });
+  if (!file || !sourceText) {
+    return res.status(400).json({ 
+      success: false,
+      error: "Missing required files"
+    });
+  }
 
-        // Send to evaluation service
-        const response = await fetch(EVALUATION_SERVICE_URL, {
-            method: 'POST',
-            body: form,
-            headers: form.getHeaders(),
-            timeout: REQUEST_TIMEOUT
-        });
+  try {
+    const fileBuffer = await fs.readFile(file.path);
+    let submissionText;
 
-        if (!response.ok) {
-            const error = await response.json().catch(() => ({}));
-            throw new Error(error.error || error.detail || 'Evaluation service error');
-        }
-
-        // Return results
-        const result = await response.json();
-        res.json({
-            success: true,
-            score: result.score ?? 0,
-            feedback: result.feedback ?? "No feedback provided",
-            textSample: submissionText.substring(0, 200) + (submissionText.length > 200 ? "..." : ""),
-            metrics: {
-                sourceLength: result.source_length,
-                translationLength: result.translation_length
-            }
-        });
-
-    } catch (error) {
-        console.error('Evaluation error:', error);
-        const errorResponse = createErrorResponse(error, {
-            supportedFormats: ["PDF (text)", "DOCX", "TXT (UTF-8)"]
-        });
-        res.status(errorResponse.statusCode).json(errorResponse);
-    } finally {
-        // Cleanup uploaded file
-        try {
-            if (req.file?.path && fs.existsSync(req.file.path)) {
-                fs.unlinkSync(req.file.path);
-            }
-        } catch (cleanupError) {
-            console.warn('File cleanup failed:', cleanupError.message);
-        }
+    if (file.mimetype === 'application/pdf') {
+      submissionText = await extractTextFromPDF(fileBuffer);
+    } else if (file.mimetype.includes('wordprocessingml.document')) {
+      submissionText = await extractTextFromDOCX(fileBuffer);
+    } else {
+      throw new Error('Unsupported file type');
     }
+
+    const { score, feedback } = await evaluateTranslation(sourceText, submissionText);
+
+    res.json({
+      success: true,
+      score,
+      feedback,
+      textSample: submissionText.substring(0, 200) + "..."
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  } finally {
+    try {
+      if (file?.path) {
+        await fs.unlink(file.path);
+      }
+    } catch (cleanupError) {
+      console.warn('File cleanup failed:', cleanupError.message);
+    }
+  }
 };

@@ -103,3 +103,4 @@ async def evaluate_translation_endpoint(
 async def health_check():
     """Endpoint for health checks"""
     return {"status": "healthy"}
+
