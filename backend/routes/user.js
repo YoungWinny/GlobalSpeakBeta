@@ -70,7 +70,7 @@ router.post('/forgot-password', async (req, res) => {
         }
         var nodemailer = require('nodemailer');
 
-        const token = jwt.sign({ usrername: user.username }, KEY, { expiresIn: '1hr' })
+        const token = jwt.sign({ username: user.username }, KEY, { expiresIn: '1hr' })
 
 
         var transporter = nodemailer.createTransport({

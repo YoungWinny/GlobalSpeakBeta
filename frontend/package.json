@@ -35,6 +35,7 @@
     "react-modal": "^3.16.1",
     "react-router-dom": "^6.26.0",
     "react-spinners": "^0.14.1",
+    "react-syntax-highlighter": "^15.5.0",
     "react-toastify": "^10.0.5",
     "sweet-alert": "^2.0.5",
     "sweetalert": "^2.1.2",

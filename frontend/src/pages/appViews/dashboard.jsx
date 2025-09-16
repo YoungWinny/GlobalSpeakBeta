@@ -119,6 +119,7 @@ import ManageUser from './dashboard pages/manageusers';
 import CreateJob from './dashboard pages/createjob';
 import ManageApplications from './dashboard pages/manageapplications';
 import JobDetails from './dashboard pages/jobdetails';
+import QuizApp from './dashboard pages/mcq';
 
 export const Dashboard = () => {
   const [darkMode, setDarkMode] = useState(false);
@@ -165,8 +166,12 @@ export const Dashboard = () => {
       case "/dashboard/manageapplications":
         return <ManageApplications darkMode={darkMode} />;
       default:
-        if (location.pathname.includes("/dashboard/job"))
-          return <JobDetails darkMode={darkMode} />;
+        if (location.pathname.includes("/dashboard/job")) {
+        return <JobDetails darkMode={darkMode} />;
+      }
+      if (location.pathname.includes("/dashboard/mcq")) {
+        return <QuizApp darkMode={darkMode} />;
+      }
         return <Home darkMode={darkMode} />;
     }
   };

@@ -9,7 +9,7 @@ import { createJob, getAllJobs, updateJob, deleteJob,getJobById } from '../contr
 router.post('/jobs', createJob);
 router.get('/jobs', getAllJobs);
 router.get('/getjobs/:id', getJobById);
-router.put('/updatejobs/:id', updateJob);
+router.patch('/updatejobs/:id', updateJob);
 router.delete('/deletejobs/:id', deleteJob);
 
 export default router;

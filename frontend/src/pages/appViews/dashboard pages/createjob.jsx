@@ -346,7 +346,7 @@ const CreateJob = ({ darkMode }) => {
               onClick={handleSubmit}
               className="bg-[#C35029] hover:bg-[#EF9273] text-white px-6 py-2 rounded-lg transition-colors duration-300"
             >
-              Post Job
+              Create Job
             </button>
           </div>
         </div>

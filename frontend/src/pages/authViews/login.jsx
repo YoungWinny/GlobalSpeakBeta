@@ -52,29 +52,6 @@ const Login = () => {
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // if (validateForm()) {
-    //   // Simulate login process
-    //   const isLoginSuccessful = (email === "test@example.com" && password === "password123");
-
-    //   if (isLoginSuccessful) {
-    //     Swal.fire({
-    //       title: 'Success!',
-    //       text: 'Login successful!',
-    //       icon: 'success',
-    //       confirmButtonText: 'Okay'
-    //     }).then(() => {
-    //       navigate('/dashboard'); // Redirect to the dashboard after login
-    //     });
-    //   } else {
-    //     Swal.fire({
-    //       title: 'Error!',
-    //       text: 'Email or password is incorrect!',
-    //       icon: 'error',
-    //       confirmButtonText: 'Try Again'
-    //     });
-    //   }
-    // }
     if (validateForm()) {
       axiosInstance.post("/auth/login", {
         email,
@@ -112,26 +89,26 @@ const Login = () => {
       <div className="form">
         <div className="form__left">
           <div className="header">
-            <img src="src/assets/images/headphone-5-svgrepo-com.svg" alt="logo" />
-            <h1 className="font-black text-3xl">GlobalSpeak</h1>
+            <img src="src/assets/images/LexiVerse.png" alt="logo"  />
           </div>
           <div className="container flex flex-col gap-[27px]">
             <div className="top">
               <h2>Welcome back!</h2>
               <img src={scribble} alt="" />
-              <p style={{ color: "rgba(185,185,185,1)" }}>
+              
+              <span style={{ color: "rgba(185,185,185,1)" }}>
                 We hire talented people around the globe who have skills in languages{" "}
-              </p>
-              <p style={{ color: "rgba(185,185,185,1)" }}>
+              </span>
+              <span style={{ color: "rgba(185,185,185,1)" }}>
                 and technology to provide deep market insight for our services.
-              </p>
+              </span>
             </div>
             <form className="flex flex-col gap-[20px] w-full items-center" onSubmit={handleSubmit}>
               <FormInput
                 leftIcon={emailIcon}
                 type="email"
                 label="Email address"
-                placeholder="thekafe@example.com"
+                placeholder="LexiVerse@example.com"
                 rightIcon={cancelIcon}
                 onClick={() => setEmail('')}
                 state={email}
@@ -188,10 +165,6 @@ const Login = () => {
         >
           <div className="father">
             <div className="son1">
-              {/* <span>
-                "We have a broad variety of jobs specializing in <br />different areas,
-                from hardware testing to data entry, <br />localization to translation."
-              </span> */}
             </div>
             <div className="son2">
               <div className="son11">
@@ -199,7 +172,7 @@ const Login = () => {
                   <img src={remote} alt="" style={{ width: '41px', height: '41px' }} />
                 </div>
                 <div className="son11-desc">
-                  <span>Over 4000+ careers of several categories available</span>
+                  <span>LexiVerse = the universe of words/language.</span>
                 </div>
               </div>
               <div className="son12">

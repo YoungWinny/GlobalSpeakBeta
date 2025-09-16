@@ -88,9 +88,9 @@ const Register = () => {
     <div className="main">
       <div className="form">
         <div className="form__left">
-          <div className="header mb-8">
-            <img src="src/assets/images/headphone-5-svgrepo-com.svg" alt="logo" />
-            <h1 className="font-black text-3xl">GlobalSpeak</h1>
+          <div className="header mb-2">
+            <img src="src/assets/images/LexiVerse.png" alt="logo" />
+           
           </div>
           <div className="container flex flex-col gap-[32px]">
             <div className="top">

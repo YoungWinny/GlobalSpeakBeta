@@ -33,8 +33,7 @@ export default router;
 
 // import { 
 //   evaluateUploadedFile,
-//   getAssessments,
-//   getAssessmentById 
+
 // } from '../controllers/aiController.js';
 
 // // Configure upload directory
@@ -117,70 +116,5 @@ export default router;
 //     evaluateUploadedFile
 // );
 
-// router.post('/generate-outline', authMiddleware, async (req, res) => {
-//     try {
-//         const response = await axios.post('http://ai-service:8000/generate-outline', {
-//             prompt: req.body.prompt
-//         });
-//         res.json(response.data);
-//     } catch (error) {
-//         console.error('AI Service error:', error.message);
-//         res.status(500).json({ error: 'AI Service unavailable' });
-//     }
-// });
-
-// router.post('/generate-questions', authMiddleware , async(req, res) => {
-//     try {
-//         const response = await axios.post('http://ai-service:8000/generate-questions', {
-//             context: req.body.context
-//         });
-//         res.json(response.data);
-//     } catch (error) {
-//         console.error('AI Service error:', error.message);
-//         res.status(500).json({ error: 'AI Service unavailable' });
-//     }
-// });
-
-// // Add these new routes to aiRoutes.js
-// router.post('/ai/simplify-text', authMiddleware, async (req, res) => {
-//     try {
-//         const response = await axios.post('http://ai-service:8000/ai/simplify-text', {
-//             context: req.body.context
-//         });
-//         res.json(response.data);
-//     } catch (error) {
-//         console.error('AI Service error:', error.message);
-//         res.status(500).json({ error: 'Text simplification service unavailable' });
-//     }
-// });
-
-// router.post('/ai/assist', authMiddleware, async (req, res) => {
-//     try {
-//         // Route to handle general assistance requests
-//         const { message, context } = req.body;
-        
-//         // Determine which AI service to call based on message content
-//         let endpoint, data;
-//         if (message.toLowerCase().includes('outline')) {
-//             endpoint = 'generate-outline';
-//             data = { prompt: message };
-//         } else if (message.toLowerCase().includes('question')) {
-//             endpoint = 'generate-questions';
-//             data = { context: context || message };
-//         } else {
-//             endpoint = 'generate-outline';
-//             data = { prompt: message };
-//         }
-
-//         const response = await axios.post(`http://ai-service:8000/ai/${endpoint}`, data);
-//         res.json(response.data);
-//     } catch (error) {
-//         console.error('AI Assistance error:', error.message);
-//         res.status(500).json({ error: 'AI assistance unavailable' });
-//     }
-// });
-
-// router.get('/assessments', getAssessments);
-// router.get('/assessments/:id', getAssessmentById);
 
 // export default router;

@@ -214,7 +214,8 @@ const JobDetails = ({ darkMode }) => {
       });
     } else {
       sessionStorage.setItem('selectedJob', JSON.stringify(job));
-      navigate(`/mcq/${job?._id}`);
+      // navigate(`/mcq/${job?._id}`);
+      navigate(`/dashboard/mcq/${job?._id}`);
     }
   };
 
