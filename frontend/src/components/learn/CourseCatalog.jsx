@@ -1,18 +1,27 @@
+
+
 import { useState, useEffect } from 'react';
 import { axiosInstance } from '../../utils/axiosInstance';
+import Swal from 'sweetalert2';
 
 export default function CourseCatalog({ onEnrollCourse }) {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [enrolling, setEnrolling] = useState(null);
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await axiosInstance.get('/api/courses');
+        const response = await axiosInstance.get('/api/courses?status=published');
         setCourses(response.data.courses || response.data);
       } catch (error) {
         console.error('Failed to fetch courses:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Failed to load courses',
+          text: error.response?.data?.message || error.message
+        });
       } finally {
         setLoading(false);
       }
@@ -20,6 +29,35 @@ export default function CourseCatalog({ onEnrollCourse }) {
     
     fetchCourses();
   }, []);
+
+  const handleEnrollCourse = async (courseId) => {
+    setEnrolling(courseId);
+    try {
+      const response = await axiosInstance.post(`/api/courses/${courseId}/enroll`);
+      
+      Swal.fire({
+        icon: 'success',
+        title: 'Enrolled successfully!',
+        text: 'You have been enrolled in the course',
+        timer: 2000,
+        showConfirmButton: false
+      });
+      
+      // Call the parent function if provided
+      if (onEnrollCourse) {
+        onEnrollCourse(courseId);
+      }
+    } catch (error) {
+      console.error('Failed to enroll:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Failed to enroll',
+        text: error.response?.data?.message || error.message
+      });
+    } finally {
+      setEnrolling(null);
+    }
+  };
 
   const filteredCourses = courses.filter(course =>
     course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -72,10 +110,18 @@ export default function CourseCatalog({ onEnrollCourse }) {
               <div className="flex justify-between items-center">
                 <span className="text-2xl font-bold text-[#C35029]">Free</span>
                 <button
-                  onClick={() => onEnrollCourse(course._id)}
-                  className="px-4 py-2 bg-[#C35029] hover:bg-[#a04020] text-white rounded-lg transition-colors"
+                  onClick={() => handleEnrollCourse(course._id)}
+                  disabled={enrolling === course._id}
+                  className="px-4 py-2 bg-[#C35029] hover:bg-[#a04020] text-white rounded-lg transition-colors disabled:opacity-50 flex items-center"
                 >
-                  Enroll Now
+                  {enrolling === course._id ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Enrolling...
+                    </>
+                  ) : (
+                    'Enroll Now'
+                  )}
                 </button>
               </div>
             </div>

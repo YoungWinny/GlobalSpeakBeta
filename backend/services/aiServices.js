@@ -1,243 +1,45 @@
-// // services/aiService.js
-// const Groq = require('groq-sdk');
-
-// const groq = new Groq({
-//   apiKey: process.env.GROQ_API_KEY
-// });
-
-// class AIService {
-//   static async generateCourseOutline(topic, language, level, specialization) {
-//     const prompt = `As an expert language course designer, generate a detailed course outline for a ${specialization} course in ${language} at ${level} level about ${topic}. 
-    
-//     Include:
-//     1. 4-6 module titles with brief descriptions
-//     2. 3-5 lessons per module with specific learning objectives
-//     3. Suggested exercise types for each lesson
-//     4. Final assessment criteria
-    
-//     Format as valid JSON with this structure:
-//     {
-//       "courseTitle": "Title",
-//       "modules": [
-//         {
-//           "title": "Module Title",
-//           "description": "Module description",
-//           "lessons": [
-//             {
-//               "title": "Lesson Title",
-//               "objectives": ["objective1", "objective2"],
-//               "exerciseType": "exercise type"
-//             }
-//           ]
-//         }
-//       ],
-//       "assessmentCriteria": ["criterion1", "criterion2"]
-//     }`;
-    
-//     try {
-//       const response = await groq.chat.completions.create({
-//         model: "mixtral-8x7b-32768",
-//         messages: [{ role: "user", content: prompt }],
-//         temperature: 0.7,
-//         max_tokens: 2000
-//       });
-      
-//       // Extract JSON from the response
-//       const content = response.choices[0].message.content;
-//       const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/{[\s\S]*}/);
-      
-//       if (jsonMatch) {
-//         return JSON.parse(jsonMatch[1] || jsonMatch[0]);
-//       }
-      
-//       throw new Error('Failed to parse AI response as JSON');
-//     } catch (error) {
-//       console.error('Groq API Error:', error);
-//       // Return a fallback outline
-//       return {
-//         courseTitle: `${specialization} Course for ${language} - ${level} Level`,
-//         modules: [
-//           {
-//             title: "Introduction to Concepts",
-//             description: "Basic foundations and terminology",
-//             lessons: [
-//               {
-//                 title: "Getting Started",
-//                 objectives: ["Understand basic concepts", "Learn fundamental terminology"],
-//                 exerciseType: "mcq"
-//               }
-//             ]
-//           }
-//         ],
-//         assessmentCriteria: ["Knowledge retention", "Practical application"]
-//       };
-//     }
-//   }
-  
-//   static async generateExercise(content, exerciseType, difficulty, language) {
-//     const prompt = `Create a ${exerciseType} exercise for ${language} learning at ${difficulty} difficulty level.
-    
-//     Based on this content: ${content}
-    
-//     Format as valid JSON with this structure:
-//     {
-//       "question": "Exercise question/prompt",
-//       "options": [{"id": "1", "text": "Option 1", "isCorrect": false}, {"id": "2", "text": "Option 2", "isCorrect": true}],
-//       "answer": "Correct answer for text-based exercises",
-//       "explanation": "Explanation of the correct answer",
-//       "hint": "Helpful hint for learners"
-//     }
-    
-//     Only include options if exercise type is mcq.`;
-    
-//     try {
-//       const response = await groq.chat.completions.create({
-//         model: "mixtral-8x7b-32768",
-//         messages: [{ role: "user", content: prompt }],
-//         temperature: 0.7,
-//         max_tokens: 1000
-//       });
-      
-//       const content = response.choices[0].message.content;
-//       const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/{[\s\S]*}/);
-      
-//       if (jsonMatch) {
-//         return JSON.parse(jsonMatch[1] || jsonMatch[0]);
-//       }
-      
-//       throw new Error('Failed to parse AI response as JSON');
-//     } catch (error) {
-//       console.error('Groq API Error:', error);
-//       // Return a fallback exercise
-//       return {
-//         question: "Translate this sentence",
-//         answer: "Sample translation",
-//         explanation: "This is a sample exercise",
-//         hint: "Think about the context"
-//       };
-//     }
-//   }
-  
-//   static async generateAssessmentQuestions(topic, count = 5, questionTypes = ['mcq', 'fill-blank'], language, level) {
-//     const prompt = `Create ${count} assessment questions about ${topic} for ${language} learners at ${level} level.
-//     Include these question types: ${questionTypes.join(', ')}. 
-    
-//     Format as valid JSON array with this structure for each question:
-//     [
-//       {
-//         "text": "Question text",
-//         "type": "question type",
-//         "options": [{"id": "1", "text": "Option 1", "isCorrect": false}, {"id": "2", "text": "Option 2", "isCorrect": true}],
-//         "answer": "Correct answer for non-mcq questions",
-//         "points": 1
-//       }
-//     ]`;
-    
-//     try {
-//       const response = await groq.chat.completions.create({
-//         model: "mixtral-8x7b-32768",
-//         messages: [{ role: "user", content: prompt }],
-//         temperature: 0.7,
-//         max_tokens: 1500
-//       });
-      
-//       const content = response.choices[0].message.content;
-//       const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/\[[\s\S]*\]/);
-      
-//       if (jsonMatch) {
-//         return JSON.parse(jsonMatch[1] || jsonMatch[0]);
-//       }
-      
-//       throw new Error('Failed to parse AI response as JSON');
-//     } catch (error) {
-//       console.error('Groq API Error:', error);
-//       // Return fallback questions
-//       return [
-//         {
-//           text: "What is the basic concept of this topic?",
-//           type: "mcq",
-//           options: [
-//             { id: "1", text: "Option A", isCorrect: false },
-//             { id: "2", text: "Option B", isCorrect: true },
-//             { id: "3", text: "Option C", isCorrect: true },
-//             { id: "4", text: "Option D", isCorrect: true }
-//           ],
-//           points: 1
-//         }
-//       ];
-//     }
-//   }
-  
-//   static async simplifyText(text, language, level) {
-//     const prompt = `Simplify the following text for ${language} learners at ${level} level: 
-    
-//     "${text}"
-    
-//     Return only the simplified text without any additional explanations or formatting.`;
-    
-//     try {
-//       const response = await groq.chat.completions.create({
-//         model: "mixtral-8x7b-32768",
-//         messages: [{ role: "user", content: prompt }],
-//         temperature: 0.7,
-//         max_tokens: 500
-//       });
-      
-//       return response.choices[0].message.content;
-//     } catch (error) {
-//       console.error('Groq API Error:', error);
-//       return text; // Return original text as fallback
-//     }
-//   }
-  
-//   static async generateExamples(text, count = 3, language) {
-//     const prompt = `Generate ${count} practical examples that illustrate this concept for ${language} learners: 
-    
-//     "${text}"
-    
-//     Format as valid JSON array of objects with "text" and "explanation" properties.`;
-    
-//     try {
-//       const response = await groq.chat.completions.create({
-//         model: "mixtral-8x7b-32768",
-//         messages: [{ role: "user", content: prompt }],
-//         temperature: 0.7,
-//         max_tokens: 800
-//       });
-      
-//       const content = response.choices[0].message.content;
-//       const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/\[[\s\S]*\]/);
-      
-//       if (jsonMatch) {
-//         return JSON.parse(jsonMatch[1] || jsonMatch[0]);
-//       }
-      
-//       throw new Error('Failed to parse AI response as JSON');
-//     } catch (error) {
-//       console.error('Groq API Error:', error);
-//       return [
-//         {
-//           text: "Example 1",
-//           explanation: "This is a sample example"
-//         }
-//       ];
-//     }
-//   }
-// }
-
-// module.exports = AIService;
 
 
-// Simple AI service with better error handling
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class AIService {
   constructor() {
+    // Don't check API key in constructor - it might not be loaded yet
+    this.apiKey = null;
+    this.initialized = false;
+  }
+
+  // Initialize when needed, not in constructor
+  initialize() {
+    if (this.initialized) return;
+    
     this.apiKey = process.env.GROQ_API_KEY;
+    this.initialized = true;
+    
     if (!this.apiKey) {
       console.warn('GROQ_API_KEY not found. AI features will use mock data.');
+    } else {
+      console.log('GROQ_API_KEY loaded successfully. AI features enabled.');
     }
   }
 
-  async makeGroqRequest(messages, model = 'mixtral-8x7b-32768', temperature = 0.7, max_tokens = 1024) {
+  async makeGroqRequest(messages, model = 'llama-3.3-70b-versatile', temperature = 0.7, max_tokens = 1024) {
+    this.initialize(); // Ensure initialized
+    
     if (!this.apiKey) {
       throw new Error('GROQ_API_KEY not configured');
     }
@@ -313,7 +115,7 @@ class AIService {
       }
     ];
 
-    return this.makeGroqRequest(messages, 'mixtral-8x7b-32768', 0.7, 2048);
+    return this.makeGroqRequest(messages, 'llama-3.3-70b-versatile', 0.7, 2048);
   }
 
   // Generate exercise questions
@@ -352,6 +154,88 @@ class AIService {
       console.error('Failed to parse AI response as JSON:', error);
       return response;
     }
+  }
+
+  // Generate assessment questions
+  async generateAssessmentQuestions(courseContent, questionCount = 10) {
+    const prompt = `
+      Based on the following course content, generate ${questionCount} assessment questions:
+      ${JSON.stringify(courseContent)}
+      
+      Include a mix of question types: multiple choice, fill-in-blank, and short answer.
+      For multiple choice, provide 4 options with one correct answer.
+      Return as JSON with questions array containing type, question, options, correctAnswer, and points.
+    `;
+
+    const messages = [
+      {
+        role: "system",
+        content: "You are an assessment designer. Create valid assessment questions based on course content."
+      },
+      {
+        role: "user",
+        content: prompt
+      }
+    ];
+
+    const response = await this.makeGroqRequest(messages, 'llama-3.3-70b-versatile', 0.5, 2048);
+    
+    try {
+      const jsonMatch = response.match(/```json\n([\s\S]*?)\n```/) || response.match(/{[\s\S]*}/);
+      if (jsonMatch) {
+        return JSON.parse(jsonMatch[1] || jsonMatch[0]);
+      }
+      return response;
+    } catch (error) {
+      console.error('Failed to parse assessment response as JSON:', error);
+      return response;
+    }
+  }
+
+  // Generate translation
+  async generateTranslation(text, sourceLang, targetLang) {
+    const prompt = `
+      Translate the following text from ${sourceLang} to ${targetLang}:
+      "${text}"
+      
+      Provide a accurate translation and include 2-3 alternative translations if applicable.
+    `;
+
+    const messages = [
+      {
+        role: "system",
+        content: "You are a professional translator. Provide accurate and natural translations."
+      },
+      {
+        role: "user",
+        content: prompt
+      }
+    ];
+
+    return this.makeGroqRequest(messages, 'llama-3.3-70b-versatile', 0.3, 512);
+  }
+
+  // Generate transcription exercise
+  async generateTranscriptionExercise(difficulty, language, topic) {
+    const prompt = `
+      Create a transcription exercise for ${difficulty} level ${language} learners.
+      Topic: ${topic}
+      Provide a paragraph of text that would be used for transcription practice.
+      Also provide 3 comprehension questions about the text.
+    `;
+
+    const messages = [
+      {
+        role: "system",
+        content: "You create transcription exercises for language learners."
+      },
+      {
+        role: "user",
+        content: prompt
+      }
+    ];
+
+    return this.makeGroqRequest(messages, 'llama-3.3-70b-versatile', 0.7, 1024);
   }
 
   // Modify text (simplify, expand, add examples)
@@ -407,6 +291,22 @@ class AIService {
         }
       ],
       
+      generateAssessmentQuestions: () => ({
+        questions: [
+          {
+            type: 'mcq',
+            question: 'Sample assessment question?',
+            options: ['Option 1', 'Option 2', 'Option 3', 'Option 4'],
+            correctAnswer: 'Option 2',
+            points: 1
+          }
+        ]
+      }),
+      
+      generateTranslation: () => `Translated text: "${args[0]}" from ${args[1]} to ${args[2]}`,
+      
+      generateTranscriptionExercise: () => `Transcription exercise for ${args[0]} level ${args[1]} learners about ${args[2]}`,
+      
       modifyText: () => `Modified text: ${args[0]} (${args[1]} version)`
     };
 
@@ -415,6 +315,8 @@ class AIService {
 
   // Wrapper method that uses mock responses if API is not available
   async callWithFallback(method, ...args) {
+    this.initialize(); // Ensure initialized before checking API key
+    
     try {
       if (!this.apiKey) {
         console.log(`Using mock response for ${method} (no API key)`);
@@ -430,5 +332,5 @@ class AIService {
   }
 }
 
-// Create and export a singleton instance - THIS IS THE KEY CHANGE
+// Create and export a singleton instance
 export const aiService = new AIService();

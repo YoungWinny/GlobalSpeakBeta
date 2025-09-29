@@ -405,6 +405,395 @@
 
 
 
+// import express from 'express';
+// import dotenv from 'dotenv';
+// import bcrypt from 'bcrypt';
+// import cors from 'cors';
+// import mongoose from 'mongoose';
+// import path from 'path';
+// import fs from 'fs';
+// import { fileURLToPath } from 'url';
+// import router from './routes/user.js';
+// import jobRoutes from './routes/jobRoutes.js';
+// import examRoutes from './routes/examRoutes.js';
+// import applicationRoutes from './routes/applicantsRoutes.js';
+// import taskRoutes from './routes/taskRoutes.js';
+// import aiRoutes from './routes/aiRoutes.js';
+// import CourseRoutes from'./routes/courseRoutes.js';
+// import CourseContentRoutes from'./routes/courseContentRoutes.js';
+// import exerciseRoutes from'./routes/exerciseRoutes.js';
+// import assessmentRoutes from './routes/assessmentRoutes.js';
+// import certificateRoutes from './routes/certificateRoute.js';
+
+// // Load environment variables FIRST
+// dotenv.config();
+// console.log('\n=== ENVIRONMENT VARIABLES ===');
+// console.log('GROQ_API_KEY:', process.env.GROQ_API_KEY ? 'LOADED' : 'MISSING');
+// console.log('MONGODB_URI:', process.env.MONGODB_URI ? 'LOADED' : 'MISSING');
+// console.log('PORT:', process.env.PORT || '3000 (default)');
+// console.log('NODE_ENV:', process.env.NODE_ENV || 'development');
+// console.log('================================\n');
+
+// // Debug: Check if API key is loaded
+// console.log('GROQ_API_KEY exists:', !!process.env.GROQ_API_KEY);
+// if (process.env.GROQ_API_KEY) {
+//   console.log('GROQ_API_KEY length:', process.env.GROQ_API_KEY.length);
+//   console.log('GROQ_API_KEY starts with:', process.env.GROQ_API_KEY.substring(0, 6) + '...');
+// }
+
+// // Configure paths and environment
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
+// const isProduction = process.env.NODE_ENV === 'production';
+// const UPLOADS_DIR = path.join(__dirname, 'uploads');
+
+// // MongoDB connection
+// try {
+//   const dbUrlLocal = "mongodb://127.0.0.1:27017/global-speak";
+//   await mongoose.connect(dbUrlLocal);
+//   console.log('MongoDB connected');
+//   console.log('GROQ_API_KEY configured:', !!process.env.GROQ_API_KEY);
+// } catch (err) {
+//   console.error('Connection to database failed!!', err.message);
+//   process.exit(1);
+// }
+
+// const app = express();
+
+// // Check upload directories permissions
+// const checkUploadDirs = () => {
+//   const dirs = [UPLOADS_DIR, path.join(UPLOADS_DIR, 'initial'), path.join(UPLOADS_DIR, 'submitted')];
+  
+//   dirs.forEach(dir => {
+//     if (!fs.existsSync(dir)) {
+//       fs.mkdirSync(dir, { recursive: true });
+//     }
+    
+//     const testFile = path.join(dir, 'test.txt');
+//     try {
+//       fs.writeFileSync(testFile, 'test');
+//       fs.unlinkSync(testFile);
+//       console.log(`✓ Write permissions OK for: ${dir}`);
+//     } catch (error) {
+//       console.error(`✗ Write permissions FAILED for: ${dir}`, error);
+//     }
+//   });
+// };
+
+// checkUploadDirs();
+
+// // Enhanced static file serving with security headers
+// app.use('/uploads', express.static(UPLOADS_DIR, {
+//   setHeaders: (res, filePath) => {
+//     res.set('Access-Control-Allow-Origin', [
+//       'http://localhost:5173',
+//       'http://127.0.0.1:5173',
+//       'http://localhost:8001',
+//       'http://127.0.0.1:8001'
+//     ]);
+//     res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+    
+//     if (isProduction) {
+//       const ext = path.extname(filePath).toLowerCase();
+//       if (['.png', '.jpg', '.jpeg', '.gif', '.pdf', '.docx', '.doc', '.txt', '.csv', '.mp3', '.mp4', '.wav'].includes(ext)) {
+//         res.set('Cache-Control', 'public, max-age=31536000, immutable');
+//       }
+//     }
+//   }
+// }));
+
+// // File access debug middleware
+// if (!isProduction) {
+//   app.use('/uploads', (req, res, next) => {
+//     console.log(`File access: ${req.path}`);
+//     next();
+//   });
+// }
+
+// // Security middleware to prevent directory traversal
+// app.use((req, res, next) => {
+//   if (req.url.includes('../') || req.url.includes('..\\')) {
+//     return res.status(400).json({ error: 'Invalid request path' });
+//   }
+//   next();
+// });
+
+// // CORS configuration
+// const corsOptions = {
+//   origin: [
+//     'http://localhost:5173',
+//     'http://127.0.0.1:5173',
+//     'http://localhost:8001',
+//     'http://127.0.0.1:8001'
+//   ],
+//   credentials: true,
+//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+//   allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'x-requested-with']
+// };
+// app.use(cors(corsOptions));
+// app.options('*', cors(corsOptions));
+
+// // Body parsers
+// app.use(express.json({ limit: '10mb' }));
+// app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// // Debug middleware to log all API requests
+// app.use((req, res, next) => {
+//   console.log(`${new Date().toISOString()} - ${req.method} ${req.originalUrl}`);
+//   next();
+// });
+
+// // ROUTES - REORDERED TO FIX THE ISSUE
+
+// // 1. First, add specific routes that might conflict with generic ones
+// app.get('/api/health', (req, res) => {
+//   res.status(200).json({ 
+//     status: 'OK', 
+//     dbStatus: mongoose.connection.readyState,
+//     groqConfigured: !!process.env.GROQ_API_KEY
+//   });
+// });
+
+// app.get('/api/test-ai', async (req, res) => {
+//   try {
+//     res.json({ 
+//       message: 'AI service test',
+//       groqConfigured: !!process.env.GROQ_API_KEY,
+//       hasApiKey: !!process.env.GROQ_API_KEY,
+//       apiKeyLength: process.env.GROQ_API_KEY ? process.env.GROQ_API_KEY.length : 0
+//     });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// });
+
+// app.get('/api/test-ai-advanced', async (req, res) => {
+//   try {
+//     if (!process.env.GROQ_API_KEY) {
+//       return res.status(400).json({
+//         success: false,
+//         message: 'GROQ_API_KEY not configured',
+//         usingMock: true
+//       });
+//     }
+
+//     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+//       method: 'POST',
+//       headers: {
+//         'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+//         'Content-Type': 'application/json'
+//       },
+//       body: JSON.stringify({
+//         messages: [
+//           {
+//             role: "system",
+//             content: "You are a helpful assistant."
+//           },
+//           {
+//             role: "user",
+//             content: "Hello! Please respond with a short test message to verify the API connection is working."
+//           }
+//         ],
+//         model: "llama-3.3-70b-versatile",
+//         temperature: 0.7,
+//         max_tokens: 50
+//       })
+//     });
+
+//     if (!response.ok) {
+//       throw new Error(`API error: ${response.status} ${response.statusText}`);
+//     }
+
+//     const data = await response.json();
+//     res.json({
+//       success: true,
+//       message: 'AI API connection successful',
+//       response: data.choices[0]?.message?.content || 'No response content'
+//     });
+//   } catch (error) {
+//     console.error('AI test failed:', error);
+//     res.status(500).json({
+//       success: false,
+//       message: error.message,
+//       usingMock: true,
+//       mockResponse: "This is a mock AI response. The actual AI service is currently unavailable."
+//     });
+//   }
+// });
+
+// // Debug environment endpoint
+// app.get('/api/debug/env', (req, res) => {
+//   res.json({
+//     groqApiKey: process.env.GROQ_API_KEY ? 'LOADED' : 'MISSING',
+//     groqApiKeyLength: process.env.GROQ_API_KEY ? process.env.GROQ_API_KEY.length : 0,
+//     groqApiKeyStart: process.env.GROQ_API_KEY ? process.env.GROQ_API_KEY.substring(0, 6) + '...' : 'N/A',
+//     nodeEnv: process.env.NODE_ENV || 'development',
+//     port: process.env.PORT || 3000,
+//     allEnvKeys: Object.keys(process.env).filter(key => 
+//       key.includes('GROQ') || key.includes('MONGO') || key.includes('PORT') || key.includes('NODE')
+//     )
+//   });
+// });
+
+// // Test GROQ API directly
+// app.get('/api/test-groq-direct', async (req, res) => {
+//   try {
+//     if (!process.env.GROQ_API_KEY) {
+//       return res.status(400).json({
+//         error: 'GROQ_API_KEY not found in environment variables',
+//         suggestion: 'Check your .env file location and content'
+//       });
+//     }
+
+//     const response = await fetch('https://api.groq.com/openai/v1/models', {
+//       headers: {
+//         'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
+//       }
+//     });
+
+//     if (response.ok) {
+//       const data = await response.json();
+//       res.json({
+//         success: true,
+//         message: 'GROQ API connection successful!',
+//         models: data.data.map(model => model.id)
+//       });
+//     } else {
+//       res.status(response.status).json({
+//         success: false,
+//         error: `GROQ API error: ${response.status} ${response.statusText}`,
+//         message: 'Check your API key validity'
+//       });
+//     }
+//   } catch (error) {
+//     res.status(500).json({
+//       success: false,
+//       error: error.message,
+//       message: 'Network error connecting to GROQ API'
+//     });
+//   }
+// });
+
+// // 2. Then add route-specific middleware
+// app.use('/auth', router);
+// app.use('/api/content', CourseContentRoutes); // FIXED: Changed from '/api/' to '/api/content'
+// app.use('/api/courses', CourseRoutes);
+// app.use('/api/exercises', exerciseRoutes);
+// app.use('/api/assessments', assessmentRoutes);
+// app.use('/api/certificates', certificateRoutes);
+
+// // 3. Finally add generic API routes (these might have :id params)
+// app.use('/api', jobRoutes);
+// app.use('/api', examRoutes);
+// app.use('/api', applicationRoutes);
+// app.use('/api', taskRoutes);
+// app.use('/api', aiRoutes);
+
+// // Health check
+// app.get('/health', (req, res) => {
+//   res.status(200).json({ 
+//     message: 'Server is running!',
+//     groqConfigured: !!process.env.GROQ_API_KEY,
+//     timestamp: new Date().toISOString()
+//   });
+// });
+
+// // Error handling middleware
+// app.use((err, req, res, next) => {
+//   console.error(`[${new Date().toISOString()}] Error:`, err.stack);
+//   res.status(500).json({ 
+//     error: 'Internal Server Error',
+//     message: isProduction ? 'Something went wrong' : err.message,
+//     ...(!isProduction && { stack: err.stack })
+//   });
+// });
+
+// // 404 handler for API routes
+// app.use('/api/*', (req, res) => {
+//   console.log(`404 - API route not found: ${req.originalUrl}`);
+//   res.status(404).json({ 
+//     message: 'API endpoint not found',
+//     path: req.originalUrl,
+//     timestamp: new Date().toISOString()
+//   });
+// });
+
+// // 404 handler for all other routes
+// app.use('*', (req, res) => {
+//   console.log(`404 - Route not found: ${req.originalUrl}`);
+//   res.status(404).json({ 
+//     message: 'Route not found',
+//     path: req.originalUrl,
+//     timestamp: new Date().toISOString()
+//   });
+// });
+
+// // Debug route listing (development only)
+// if (!isProduction) {
+//   setTimeout(() => {
+//     console.log("\n=== REGISTERED ROUTES ===");
+//     const routeList = [];
+    
+//     const printRoutes = (stack, prefix = '') => {
+//       stack.forEach((layer) => {
+//         if (layer.route) {
+//           const methods = Object.keys(layer.route.methods).join(', ').toUpperCase();
+//           routeList.push(`${methods.padEnd(6)} ${prefix}${layer.route.path}`);
+//         } else if (layer.name === 'router' && layer.handle.stack) {
+//           const routerPrefix = layer.regexp.toString().match(/\/\^(\/?[^]*?)\\\//);
+//           let basePath = '';
+//           if (routerPrefix && routerPrefix[1]) {
+//             basePath = routerPrefix[1].replace(/\\\//g, '/');
+//           }
+//           printRoutes(layer.handle.stack, basePath);
+//         }
+//       });
+//     };
+    
+//     printRoutes(app._router.stack);
+//     console.log(routeList.sort().join('\n'));
+//     console.log("=== END OF ROUTES ===\n");
+//   }, 100);
+// }
+
+// // Server startup
+// const PORT = process.env.PORT || 3000;
+// app.listen(PORT, () => {
+//   console.log(`
+//   Server is running on port ${PORT}
+//   Environment: ${isProduction ? 'Production' : 'Development'}
+//   Uploads directory: ${UPLOADS_DIR}
+//   Database: ${mongoose.connection.host}/${mongoose.connection.name}
+//   GROQ API: ${process.env.GROQ_API_KEY ? 'Configured' : 'Not configured'}
+//   `);
+  
+//   console.log('\nTesting endpoints:');
+//   console.log(`  GET  http://localhost:${PORT}/api/health`);
+//   console.log(`  GET  http://localhost:${PORT}/api/content/debug/test`);
+//   console.log(`  POST http://localhost:${PORT}/api/content/ai/generate`);
+// });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import express from 'express';
 import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
@@ -424,9 +813,16 @@ import CourseContentRoutes from'./routes/courseContentRoutes.js';
 import exerciseRoutes from'./routes/exerciseRoutes.js';
 import assessmentRoutes from './routes/assessmentRoutes.js';
 import certificateRoutes from './routes/certificateRoute.js';
+import multer from 'multer';
 
 // Load environment variables FIRST
 dotenv.config();
+console.log('\n=== ENVIRONMENT VARIABLES ===');
+console.log('GROQ_API_KEY:', process.env.GROQ_API_KEY ? 'LOADED' : 'MISSING');
+console.log('MONGODB_URI:', process.env.MONGODB_URI ? 'LOADED' : 'MISSING');
+console.log('PORT:', process.env.PORT || '3000 (default)');
+console.log('NODE_ENV:', process.env.NODE_ENV || 'development');
+console.log('================================\n');
 
 // Debug: Check if API key is loaded
 console.log('GROQ_API_KEY exists:', !!process.env.GROQ_API_KEY);
@@ -454,9 +850,63 @@ try {
 
 const app = express();
 
+// Configure multer for media uploads
+const mediaStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const mediaDir = path.join(UPLOADS_DIR, 'media');
+    if (!fs.existsSync(mediaDir)) {
+      fs.mkdirSync(mediaDir, { recursive: true });
+    }
+    cb(null, mediaDir);
+  },
+  filename: (req, file, cb) => {
+    // Generate unique filename
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const ext = path.extname(file.originalname);
+    const baseName = path.basename(file.originalname, ext).replace(/[^a-zA-Z0-9]/g, '_');
+    cb(null, baseName + '-' + uniqueSuffix + ext);
+  }
+});
+
+const mediaFileFilter = (req, file, cb) => {
+  // Check file types for media
+  const allowedTypes = {
+    'image/jpeg': true,
+    'image/png': true,
+    'image/gif': true,
+    'image/webp': true,
+    'video/mp4': true,
+    'video/webm': true,
+    'video/ogg': true,
+    'audio/mpeg': true,
+    'audio/wav': true,
+    'audio/ogg': true,
+    'audio/mp4': true
+  };
+
+  if (allowedTypes[file.mimetype]) {
+    cb(null, true);
+  } else {
+    cb(new Error(`Invalid file type: ${file.mimetype}. Only images, videos, and audio files are allowed.`), false);
+  }
+};
+
+const mediaUpload = multer({
+  storage: mediaStorage,
+  fileFilter: mediaFileFilter,
+  limits: {
+    fileSize: 50 * 1024 * 1024 // 50MB limit for media files
+  }
+});
+
 // Check upload directories permissions
 const checkUploadDirs = () => {
-  const dirs = [UPLOADS_DIR, path.join(UPLOADS_DIR, 'initial'), path.join(UPLOADS_DIR, 'submitted')];
+  const dirs = [
+    UPLOADS_DIR, 
+    path.join(UPLOADS_DIR, 'initial'), 
+    path.join(UPLOADS_DIR, 'submitted'),
+    path.join(UPLOADS_DIR, 'media') // Add media directory
+  ];
   
   dirs.forEach(dir => {
     if (!fs.existsSync(dir)) {
@@ -588,7 +1038,7 @@ app.get('/api/test-ai-advanced', async (req, res) => {
             content: "Hello! Please respond with a short test message to verify the API connection is working."
           }
         ],
-        model: "mixtral-8x7b-32768",
+        model: "llama-3.3-70b-versatile",
         temperature: 0.7,
         max_tokens: 50
       })
@@ -615,9 +1065,136 @@ app.get('/api/test-ai-advanced', async (req, res) => {
   }
 });
 
+// Debug environment endpoint
+app.get('/api/debug/env', (req, res) => {
+  res.json({
+    groqApiKey: process.env.GROQ_API_KEY ? 'LOADED' : 'MISSING',
+    groqApiKeyLength: process.env.GROQ_API_KEY ? process.env.GROQ_API_KEY.length : 0,
+    groqApiKeyStart: process.env.GROQ_API_KEY ? process.env.GROQ_API_KEY.substring(0, 6) + '...' : 'N/A',
+    nodeEnv: process.env.NODE_ENV || 'development',
+    port: process.env.PORT || 3000,
+    allEnvKeys: Object.keys(process.env).filter(key => 
+      key.includes('GROQ') || key.includes('MONGO') || key.includes('PORT') || key.includes('NODE')
+    )
+  });
+});
+
+// Test GROQ API directly
+app.get('/api/test-groq-direct', async (req, res) => {
+  try {
+    if (!process.env.GROQ_API_KEY) {
+      return res.status(400).json({
+        error: 'GROQ_API_KEY not found in environment variables',
+        suggestion: 'Check your .env file location and content'
+      });
+    }
+
+    const response = await fetch('https://api.groq.com/openai/v1/models', {
+      headers: {
+        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
+      }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      res.json({
+        success: true,
+        message: 'GROQ API connection successful!',
+        models: data.data.map(model => model.id)
+      });
+    } else {
+      res.status(response.status).json({
+        success: false,
+        error: `GROQ API error: ${response.status} ${response.statusText}`,
+        message: 'Check your API key validity'
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      message: 'Network error connecting to GROQ API'
+    });
+  }
+});
+
+// Media upload route - ADD THIS NEW ROUTE
+app.post('/api/upload/media', mediaUpload.single('file'), (req, res) => {
+  try {
+    console.log('Media upload request received:', {
+      originalname: req.file?.originalname,
+      mimetype: req.file?.mimetype,
+      size: req.file?.size
+    });
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No file uploaded'
+      });
+    }
+
+    const fileUrl = `/uploads/media/${req.file.filename}`;
+    
+    console.log('Media file uploaded successfully:', fileUrl);
+    
+    res.json({
+      success: true,
+      message: 'File uploaded successfully',
+      fileUrl: fileUrl,
+      filename: req.file.filename,
+      originalName: req.file.originalname,
+      size: req.file.size,
+      mimetype: req.file.mimetype,
+      type: req.body.type || getFileType(req.file.mimetype)
+    });
+  } catch (error) {
+    console.error('Media upload error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to upload file: ' + error.message
+    });
+  }
+});
+
+// Helper function to determine file type from mimetype
+function getFileType(mimetype) {
+  if (mimetype.startsWith('image/')) return 'image';
+  if (mimetype.startsWith('video/')) return 'video';
+  if (mimetype.startsWith('audio/')) return 'audio';
+  return 'file';
+}
+
+// Error handling for multer
+app.use((error, req, res, next) => {
+  if (error instanceof multer.MulterError) {
+    if (error.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({
+        success: false,
+        message: 'File too large. Maximum size is 50MB.'
+      });
+    }
+    if (error.code === 'LIMIT_UNEXPECTED_FILE') {
+      return res.status(400).json({
+        success: false,
+        message: 'Unexpected field in file upload'
+      });
+    }
+  }
+  
+  if (error.message.includes('Invalid file type')) {
+    return res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+  
+  next(error);
+});
+
 // 2. Then add route-specific middleware
 app.use('/auth', router);
-app.use('/api/content', CourseContentRoutes); // FIXED: Changed from '/api/' to '/api/content'
+app.use('/api/content', CourseContentRoutes);
 app.use('/api/courses', CourseRoutes);
 app.use('/api/exercises', exerciseRoutes);
 app.use('/api/assessments', assessmentRoutes);
@@ -712,4 +1289,5 @@ app.listen(PORT, () => {
   console.log(`  GET  http://localhost:${PORT}/api/health`);
   console.log(`  GET  http://localhost:${PORT}/api/content/debug/test`);
   console.log(`  POST http://localhost:${PORT}/api/content/ai/generate`);
+  console.log(`  POST http://localhost:${PORT}/api/upload/media`);
 });

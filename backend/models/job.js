@@ -70,7 +70,7 @@ const jobSchema = new mongoose.Schema({
   category: {
     type: String,
     required: true,
-    enum: ['Tech', 'Design', 'Marketing', 'Business', 'Real Estate', 'Industry', 'Finance']
+    enum: ['Tech', 'Design', 'Marketing', 'Business', 'Real Estate', 'Industry', 'Finance', 'Archiving']
   },
   jobType: {
     type: String,

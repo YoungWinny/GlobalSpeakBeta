@@ -358,7 +358,7 @@ import location from "../../assets/images/location-pin-svgrepo-com.svg";
 import arrow from "../../assets/images/arrow-right-svgrepo-com-5.svg";
 import mapImage from "../../assets/images/Mapsicle Map.png";
 import translate from "../../assets/images/translation-icon-translate-language-svgrepo-com.svg";
-import logo from "../../assets/images/headphone-5-svgrepo-com.svg";
+import logo from "../../assets/images/LexiVerse.png";
 import scribble from "../../assets/images/scribblecolor.svg";
 
 // Register GSAP plugins
@@ -510,7 +510,7 @@ export const Homepage = () => {
         <div className="flex flex-row items-center">
           <img className="w-10 h-10" src={logo} alt="logo" />
           <h1 className="font-black text-3xl ml-2 bg-gradient-to-r from-[#EF9273] to-[#F4A261] bg-clip-text text-transparent">
-            GlobalSpeak
+            LexiVerse
           </h1>
         </div>
         <nav className="flex items-center space-x-6">
@@ -799,7 +799,7 @@ export const Homepage = () => {
             {
               name: "Sarah Johnson",
               role: "French Translator",
-              quote: "GlobalSpeak has provided me with consistent work and fair compensation. The platform is easy to use and the support team is responsive.",
+              quote: "LexiVerse has provided me with consistent work and fair compensation. The platform is easy to use and the support team is responsive.",
               avatar: "https://randomuser.me/api/portraits/women/43.jpg"
             },
             {
@@ -939,7 +939,7 @@ export const Homepage = () => {
                   </div>
                   <div>
                     <h4 className="font-bold">Email</h4>
-                    <p>contact@globalspeak.com</p>
+                    <p>contact@lexiverse.com</p>
                   </div>
                 </div>
               </div>
@@ -996,7 +996,7 @@ export const Homepage = () => {
             <div className="flex items-center mb-6">
               <img className="w-10 h-10" src={logo} alt="logo" />
               <h1 className="font-black text-2xl ml-2 bg-gradient-to-r from-[#EF9273] to-[#F4A261] bg-clip-text text-transparent">
-                GlobalSpeak
+                LexiVerse
               </h1>
             </div>
             <p className="text-gray-600 mb-6">
@@ -1066,7 +1066,7 @@ export const Homepage = () => {
         </div>
 
         <div className="border-t border-gray-200 mt-12 pt-8 text-center text-gray-500">
-          <p>© {new Date().getFullYear()} GlobalSpeak. All rights reserved • Privacy Policy • Terms and Conditions</p>
+          <p>© {new Date().getFullYear()} LexiVerse. All rights reserved • Privacy Policy • Terms and Conditions</p>
         </div>
       </footer>
     </div>

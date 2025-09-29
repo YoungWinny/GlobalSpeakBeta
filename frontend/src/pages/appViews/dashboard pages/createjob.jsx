@@ -99,7 +99,7 @@ const CreateJob = ({ darkMode }) => {
   };
 
   // Job categories and options
-  const categories = ['Tech', 'Design', 'Marketing', 'Business', 'Real Estate', 'Industry', 'Finance'];
+  const categories = ['Tech', 'Design', 'Marketing', 'Business', 'Real Estate', 'Industry', 'Finance','Archiving'];
   const jobTypes = ['Full-time', 'Part-time', 'Remote', 'Contract', 'Internship'];
   const experienceLevels = ['Beginner', 'Mid level', 'Above average', 'Senior level', 'Expert'];
   const locations = ['Yaounde', 'Douala', 'Ebolowa', 'Ngaoundere', 'Bafoussam', 'Maroua', 'Bamenda', 'Bertoua', 'Buea', 'Garoua'];
